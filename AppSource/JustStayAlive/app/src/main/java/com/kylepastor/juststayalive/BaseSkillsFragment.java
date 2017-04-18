@@ -90,7 +90,7 @@ public  class BaseSkillsFragment extends Fragment {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 UpdateUserAction pass_user_request = new UpdateUserAction(v.getContext()); // can add params for a constructor if needed
-                                pass_user_request.execute("https://jsonplaceholder.typicode.com/posts/1");
+                                pass_user_request.execute("http://192.168.0.191:3000/notes");
                             }
                         });
                 AlertDialog alert = builder.create();
