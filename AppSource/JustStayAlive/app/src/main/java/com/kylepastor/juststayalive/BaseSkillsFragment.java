@@ -81,10 +81,6 @@ public  class BaseSkillsFragment extends Fragment {
         Button gather_private= (Button) rootView.findViewById(R.id.gather_private_button);
         gather_private.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                UpdateUserAction myTask = new UpdateUserAction(); // can add params for a constructor if needed
-                myTask.execute("https://jsonplaceholder.typicode.com/posts/1");
-
-
                 final View v;
                 v = view;
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
@@ -93,13 +89,8 @@ public  class BaseSkillsFragment extends Fragment {
                         .setCancelable(true)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-
-
-
-
-//                                // Call the waiting dialog box
-//                                ProgressDialog s = ProgressDialog.show(v.getContext(), "",
-//                                        "Waiting for other players to finish their turns...", true);
+                                UpdateUserAction pass_user_request = new UpdateUserAction(v.getContext()); // can add params for a constructor if needed
+                                pass_user_request.execute("https://jsonplaceholder.typicode.com/posts/1");
                             }
                         });
                 AlertDialog alert = builder.create();

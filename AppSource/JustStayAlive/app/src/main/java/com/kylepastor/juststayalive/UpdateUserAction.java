@@ -1,5 +1,7 @@
 package com.kylepastor.juststayalive;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -17,6 +19,11 @@ import java.util.logging.Logger;
  */
 
 public class UpdateUserAction extends AsyncTask<String,Integer,String> {
+    private Context mContext;
+    ProgressDialog s;
+    public UpdateUserAction (Context context){
+        mContext = context;
+    }
 
     public String getJSON(String url, int timeout) {
         HttpURLConnection c = null;
@@ -70,6 +77,9 @@ public class UpdateUserAction extends AsyncTask<String,Integer,String> {
          *    do things before doInBackground() code runs
          *    such as preparing and showing a Dialog or ProgressBar
         */
+        // Call the waiting dialog box
+        s = ProgressDialog.show(mContext, "",
+                "Waiting for other players to finish their turns...", true);
     }
 
     @Override
@@ -97,5 +107,6 @@ public class UpdateUserAction extends AsyncTask<String,Integer,String> {
          *    close any dialogs/ProgressBars/etc...
         */
         Log.d("asasd",result);
+        s.dismiss();
     }
 }
