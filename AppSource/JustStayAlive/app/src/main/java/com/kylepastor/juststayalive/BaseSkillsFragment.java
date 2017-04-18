@@ -3,6 +3,7 @@ package com.kylepastor.juststayalive;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -16,6 +17,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public  class BaseSkillsFragment extends Fragment {
@@ -61,21 +73,33 @@ public  class BaseSkillsFragment extends Fragment {
     }
 
 
-    public void setSkillClickEvents(View rootView ){
+
+
+
+
+    public void setSkillClickEvents(View rootView){
         Button gather_private= (Button) rootView.findViewById(R.id.gather_private_button);
         gather_private.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                UpdateUserAction myTask = new UpdateUserAction(); // can add params for a constructor if needed
+                myTask.execute("https://jsonplaceholder.typicode.com/posts/1");
+
+
                 final View v;
                 v = view;
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("PRIVATE GATHER");
-                builder.setMessage("This action will add 2 food to your private stockpile.")
+                builder.setMessage("safsdfs")
                         .setCancelable(true)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // Call the waiting dialog box
-                                ProgressDialog s = ProgressDialog.show(v.getContext(), "",
-                                        "Waiting for other players to finish their turns...", true);
+
+
+
+
+//                                // Call the waiting dialog box
+//                                ProgressDialog s = ProgressDialog.show(v.getContext(), "",
+//                                        "Waiting for other players to finish their turns...", true);
                             }
                         });
                 AlertDialog alert = builder.create();
