@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/gameplay_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,8 +8,9 @@
     <LinearLayout
         android:id="@+id/character_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
+        android:layout_height="62dp"
+        android:layout_weight="0.04"
+        android:background="@drawable/banner"
         android:orientation="horizontal"
         android:padding="1dp">
 
@@ -17,7 +19,9 @@
             android:id="@+id/health_points"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
+            android:background="@drawable/heart"
+            android:gravity="center"
             android:padding="3dp"
             android:paddingBottom="3dp"
             android:paddingEnd="3dp"
@@ -25,16 +29,20 @@
             android:paddingRight="3dp"
             android:paddingStart="3dp"
             android:paddingTop="3dp"
-            android:text="HP 100/100"
-            android:textAlignment="textStart"
+            android:text="100"
+            android:textAlignment="gravity"
             android:textColor="@android:color/background_light"
-            android:textSize="12sp" />
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:translationY="0dp"
+            android:typeface="monospace" />
 
         <TextView
             android:id="@+id/class_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center_vertical"
             android:padding="3dp"
             android:paddingBottom="3dp"
             android:paddingEnd="3dp"
@@ -45,14 +53,15 @@
             android:text="Warrior"
             android:textAlignment="center"
             android:textColor="@android:color/background_light"
-            android:textSize="18sp"
+            android:textSize="36sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/consumption"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
+            android:gravity="center"
             android:padding="3dp"
             android:paddingBottom="3dp"
             android:paddingEnd="3dp"
@@ -60,10 +69,11 @@
             android:paddingRight="3dp"
             android:paddingStart="3dp"
             android:paddingTop="3dp"
-            android:text="20 Food/Turn"
-            android:textAlignment="textEnd"
+            android:text="20"
+            android:textAlignment="center"
             android:textColor="@android:color/background_light"
-            android:textSize="12sp" />
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
