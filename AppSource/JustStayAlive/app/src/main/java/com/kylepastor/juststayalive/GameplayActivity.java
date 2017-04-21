@@ -14,12 +14,20 @@ import android.support.v4.app.FragmentManager;
 import android.widget.ImageView;
 
 public class GameplayActivity extends AppCompatActivity  {
-    private ViewPager mPager;
-    FragmentPagerAdapter mPagerAdapter;
+    private String character_class_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Call the webAPI class
+        JSA_WebAPI myAPI_conn = new JSA_WebAPI();
+        myAPI_conn.init();
+        character_class_name = myAPI_conn.getCharacterClass();
+
+
+
+
         setContentView(R.layout.gameplay_activity);
         // Instantiate a ViewPager and a PagerAdapter.
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -47,6 +55,10 @@ public class GameplayActivity extends AppCompatActivity  {
 
 
     }
+
+    public String getCharacterClass(){
+        return character_class_name;
+    };
 
 
     @Override

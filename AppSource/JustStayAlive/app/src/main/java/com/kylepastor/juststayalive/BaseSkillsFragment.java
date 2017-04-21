@@ -1,13 +1,11 @@
 package com.kylepastor.juststayalive;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
+import android.content.res.AssetManager;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,25 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+import android.widget.TextView;
+import com.opencsv.CSVReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
+// BASE SKILL FRAGMENT:  This class shows the basic skills and UI for the actions a player may take.
+// The class should be flexible enough to allow random character classes to be loaded in based on
+// values in a local CSV file deligated by the web API.
 public  class BaseSkillsFragment extends Fragment {
-
-
-
+    // When creating the viewpager we must pass back an instance of the fragment so we can make changes
     public static BaseSkillsFragment newInstance(){
         BaseSkillsFragment frag = new BaseSkillsFragment();
         return frag;
@@ -42,42 +33,76 @@ public  class BaseSkillsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                             Bundle savedInstanceState) {
-        View rootView = (View) inflater.inflate(
-                R.layout.base_skills_fragment, container, false);
+        // Grab the root view which represents everything on the fragment itself
+        View rootView = (View) inflater.inflate(R.layout.base_skills_fragment, container, false);
 
+        // Next we need to set the character class assets based on the input csv (or string definition
+        // given by the API)
+        String class_name = ((GameplayActivity)getActivity()).getCharacterClass();
+        setClassAssets(class_name,rootView);
 
-        setSkillClickEvents(rootView);
-
-//        final LinearLayout lol = (LinearLayout) rootView.findViewById(R.id.base_skill_layout);
-//
-//        final ImageView view1 = (ImageView) rootView.findViewById(R.id.class_image);
-//        final ImageView view2 = (ImageView) rootView.findViewById(R.id.class_image_2);
-//
-//
-//        lol.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                FlipAnimation flipAnimation = new FlipAnimation(view1,view2);
-////                if (view1.getVisibility() == View.GONE) {
-////                    flipAnimation.reverse();
-////                }else{
-////                    view1.startAnimation(flipAnimation);
-////                }
-//            }
-//        });
-
-
-
+        // Set the various click events for the base skills buttons
+        setClassClickEvents(rootView);
 
         return rootView;
     }
 
 
+    // Set Class Assets: Is public and is responsible for the building of the class UI and details
+    public void setClassAssets(String class_name,View rootView){
+        // Open the asset manager so we can grab the local csv files that define the build
+        AssetManager assetManager = getContext().getAssets();
+        try {
+            // Open and read an input steam and parse the csv based on the input string
+            InputStream csvStream = assetManager.open(class_name + ".csv");
+            InputStreamReader csvStreamReader = new InputStreamReader(csvStream);
+            CSVReader csvReader = new CSVReader(csvStreamReader);
 
+            // Each line is parsed with the CSV reader class and then we make the adjustments to the assets
+            String[] line;
+            TextView text;
+            Button button;
+            ImageView imageView;
 
+            // Load and read the CSV and update the view.  Can be extended later if need be.
+            while ((line = csvReader.readNext()) != null) {
+                switch (line[0]) {
+                    case "class_name":
+                        text = (TextView) getActivity().findViewById(R.id.class_name);
+                        text.setText(line[1]);
+                    case "class_main_image":
+                        imageView = (ImageView) rootView.findViewById(R.id.class_image);
+                        int imageResource = rootView.getResources().getIdentifier(line[1], "drawable", getContext().getPackageName());
+                        imageView.setImageResource(imageResource);
+                    case "health":
+                        text = (TextView) getActivity().findViewById(R.id.health_points);
+                        text.setText(line[1]);
+                    case "consumption":
+                        text = (TextView) getActivity().findViewById(R.id.consumption);
+                        text.setText(line[1]);
+                    case "private_gather":
+                        button = (Button) rootView.findViewById(R.id.gather_private_button);
+                        button.setText("Gather " + line[1] + " private resources");
+                    case "group_gather":
+                        button = (Button) rootView.findViewById(R.id.group_resource_button);
+                        button.setText("Gather " + line[1] + " group resources");
+                    case "attack":
+                        button = (Button) rootView.findViewById(R.id.attack_button);
+                        button.setText("Attack someone for " + line[1] + " damage");
+                    case "heal":
+                        button = (Button) rootView.findViewById(R.id.heal_button);
+                        button.setText("Heal " + line[1] + " HP");
+                    default:
+                        Log.d("setClassAssets ERROR:",line[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    };
 
-
-    public void setSkillClickEvents(View rootView){
+    // Set Class Click Events: These link the button press with the dialogs and API web calls
+    public void setClassClickEvents(View rootView){
         Button gather_private= (Button) rootView.findViewById(R.id.gather_private_button);
         gather_private.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -135,36 +160,7 @@ public  class BaseSkillsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//
-//        // Grab the image view
-//        final ImageView view1 = (ImageView) getActivity().findViewById(R.id.class_image);
-//        final ImageView view2 = (ImageView) getActivity().findViewById(R.id.class_image_2);
-//
-//
-//        // Now we are going to set a click event listener to see when someone taps the card
-//        view1.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getActivity(),"Text!",Toast.LENGTH_SHORT).show();
-//
-//                FlipAnimation flipAnimation = new FlipAnimation(view1,view2);
-//                if (view1.getVisibility() == View.GONE) {
-//                    flipAnimation.reverse();
-//                }else{
-//                    view1.startAnimation(flipAnimation);
-//                }
-//            }
-//        });
-
-
     }
-
-
-
-    public void omg(){
-        Log.d("LOL","ZMG");
-    }
-
 }
 
 

@@ -1,0 +1,10 @@
+class_name,Warrior
+class_main_image,warrior
+health,100
+consumption,20
+private_gather,2
+group_gather,4
+attack,4
+heal,2
+skill_name,Eye for an Eye
+skill_description, In the fire of battle one pays no mind to the body.  Perform 1 damage to everyone, but take that much damage in return.

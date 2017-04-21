@@ -1,0 +1,10 @@
+class_name,Thief
+class_main_image,thief
+health,90
+consumption,10
+private_gather,2
+group_gather,2
+attack,5
+heal,2
+skill_name,Pickpocket
+skill_description, In this flock of sheep I am the wolf. Steal 2 food from the community stockpile.
