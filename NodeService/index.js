@@ -122,6 +122,25 @@ app.get('/getGroupName', function(req, res) {
 });
 
 
+app.get('/checkGameID', function(req, res) {
+  var gameID = req.query.game_ID;
+  console.log(gameID);
+
+  db.find({"group_name": gameID},function(err, result) {
+    console.log(result);
+    if (result.length!=0) {
+    //do something
+    result = "1";
+  }else {
+    result = "0";
+  }
+    if (err) res.send(err);
+    res.json(result);
+  });
+});
+
+
+
 
 app.get('/', function(req, res) {
   res.json({notes: "This is your notebook. Edit this to start saving your notes!"})
