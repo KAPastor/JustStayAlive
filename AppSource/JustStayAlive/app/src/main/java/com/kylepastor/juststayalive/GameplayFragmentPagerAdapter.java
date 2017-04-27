@@ -9,11 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class CustomFragmentPagerAdapter extends FragmentPagerAdapter {
+public class GameplayFragmentPagerAdapter extends FragmentPagerAdapter {
 
     private static int totalMenu = 3;
 
-    public CustomFragmentPagerAdapter(FragmentManager fm) {
+    public GameplayFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
