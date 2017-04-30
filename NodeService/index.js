@@ -131,6 +131,144 @@ app.get('/checkPlayerGameState', function(req, res) {
 
 
 
+app.get('/checkAllTurnsPlayed', function(req, res) {
+  // Open the database
+  var db = new sqlite3.Database('JustStayAlive.db');
+  // Grab the gameID and the player name
+  var gameID = req.query.gameID;
+  db.serialize(function() { // serialize
+    // Check the turn status of all players and if none are zero return true
+    db.all("SELECT turn_status FROM player WHERE gameID='"+gameID+"'", function(err, rows) {
+      rows.forEach(function (row) {
+        if (row.turn_status==0){
+          res.json({turn_status:0});
+        }
+      });
+
+      // Do all of the main shit
+      updateMainGameState();
+      res.json({turn_status:1});
+    });
+  });
+});
+
+function updateMainGameState(){
+  // Need to do all of the calculations based on user actions.  ALSO RESET THE PLAYER TURN AND ACTION
+  // Action list:
+  // GroupGather -> Adds 4 resources to the public stockpile
+  // PrivateGather -> Adds 2 resources to the public stockpile
+  // Attack:PlayerName -> Removes 2 health from a player
+  // Heal:PlayerName -> Adds 2 health to a player
+  // Special -> Applies the special skill.
+
+
+  var totalGroupGather = 0;
+  var playerNewHealth;
+  var playerNewStockpile;
+  var groupNewStockpile;
+
+  // Loop over the players and update the game states:
+  db.all("SELECT * FROM player WHERE gameID='"+gameID+"'", function(err, players) {
+    // For each player let us look at what happens
+    players.forEach(function (player) {
+      // The values of the gather and attack should come from the class properties later.
+      groupGatherValue = 4;
+      privateGatherValue = 2;
+      attackValue = 2;
+      healValue = 2;
+
+      // Get the current player infro
+      playerNewHealth = player.health;
+      playerNewStockpile = player.private_stockpile;
+
+
+      // Grab the action
+      var action = player.action;
+      var action_split = action.split(":");
+      var player_action = action_split[0];
+      var action_value = '';
+      if (action_split>1){
+        action_value = action_split[1];
+      }
+
+      switch (player_action) {
+        case GroupGather:
+          // Add to the totalGroupGather
+          totalGroupGather = totalGroupGather + groupGatherValue;
+          //db.run("UPDATE player SET turn_status=0, action='' WHERE gameID='"+gameID+"' AND name='"+playerName+"'");
+          break;
+        case PrivateGather:
+          // Add to the private stockpile
+          var new_stockpile = player.private_stockpile + privateGatherValue;
+          //db.run("UPDATE player SET turn_status=0, action='',private_stockpile="+new_stockpile+"  WHERE gameID='"+gameID+"' AND name='"+playerName+"'");
+          break;
+        case Attack:
+          // Reduce the health of the player attacked
+          var attack_current_health;
+          db.all("SELECT health FROM player WHERE gameID='"+gameID+"' AND name='"+action_value+"'", function(err, players) {
+              attack_current_health = players[0].health;
+              var new_health = attack_current_health - attackValue;
+              db.run("UPDATE player SET health="+new_health+"  WHERE gameID='"+gameID+"' AND name='"+action_value+"'");
+              // Now update the game state for the player
+              //db.run("UPDATE player SET turn_status=0, action='' WHERE gameID='"+gameID+"' AND name='"+playerName+"'");
+          });
+
+          break;
+        case Heal:
+          // Increase the health of the player healed
+          var heal_current_health;
+          db.all("SELECT health FROM player WHERE gameID='"+gameID+"' AND name='"+action_value+"'", function(err, players) {
+              heal_current_health = players[0].health;
+              var new_health = heal_current_health + healValue;
+              db.run("UPDATE player SET health="+new_health+"  WHERE gameID='"+gameID+"' AND name='"+action_value+"'");
+              // Now update the game state for the player
+              //db.run("UPDATE player SET turn_status=0, action='' WHERE gameID='"+gameID+"' AND name='"+playerName+"'");
+          });
+          break;
+        default:
+      }
+
+      // Now we need to calculate the new health and stuff based on consumption
+      // Need the current group stockpile, pricate stockpile and consumption and health
+      db.all("SELECT * FROM gamestate WHERE gameID='"+gameID+"'", function(err, rows) {
+        groupNewStockpile =rows[0].group_stockpile;
+        // Since we currently have access to the player data here we first remove from the private_stockpile
+        playerNewStockpile = playerNewStockpile - player.consumption;
+        console.log(playerNewStockpile);
+        if (playerNewStockpile<0){
+          groupNewStockpile = groupNewStockpile + playerNewStockpile;
+          if (groupNewStockpile<0){
+            playerNewHealth = playerNewHealth + groupNewStockpile;
+          }
+        }
+        // After all of this is done we update
+        db.run("UPDATE player SET turn_status=0, action='',health="+playerNewHealth+",private_stockpile="+playerNewStockpile+" WHERE gameID='"+gameID+"' AND name='"+playerName+"'");
+        db.run("UPDATE gamestate SET group_stockpile="+groupNewStockpile+", WHERE gameID='"+gameID+"'");
+      });
+    });
+
+    res.json({update_status:1});
+  });
+}
+
+// Applies the action
+app.get('/commitPlayerTurn', function(req, res) {
+  // Open the database
+  var db = new sqlite3.Database('JustStayAlive.db');
+  // Grab the gameID and the player name
+  var gameID = req.query.gameID;
+  var playerName = req.query.playerName;
+  var action = req.query.action;
+
+  db.serialize(function() { // serialize
+    // Update the player action and turn_status
+    db.run("UPDATE player SET turn_status=1, action='"+actionID+"' WHERE gameID='"+gameID+"' AND name='"+playerName+"'");
+    res.json({update:1});
+  });
+});
+
+
+
 
 
 app.listen(3000)
