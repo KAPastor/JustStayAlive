@@ -103,7 +103,7 @@ public class JSA_WebAPI_Transaction extends AsyncTask<String,Integer,String> {
          *    display it or send to mainactivity
          *    close any dialogs/ProgressBars/etc...
         */
-        Log.d("asasd",result);
         s.dismiss();
+        super.onPostExecute(result);
     }
 }

@@ -40,7 +40,8 @@ public  class CreateGameFragment extends Fragment {
                 Log.d("test",player_name);
 
                 // Now that we have the player name and game ID request we call the API method
-                myAPI_conn.create_game(rootView,gameID,player_name);
+                String  create_return = myAPI_conn.create_game(rootView,gameID,player_name);
+                Log.d("adaaaaaaaa0",create_return);
             }
         });
 

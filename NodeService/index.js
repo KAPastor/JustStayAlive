@@ -5,7 +5,10 @@ var app = express();
 
 var sqlite3 = require('sqlite3');
 
+function getRandomClass(){
 
+  return {name:"Warrior",health:100,consumption:20,private_stockpile:0};
+}
 app.get('/createGame', function(req, res) {
   // Open the database
   var db = new sqlite3.Database('JustStayAlive.db');
@@ -128,8 +131,6 @@ app.get('/checkPlayerGameState', function(req, res) {
     });
   });
 });
-
-
 
 app.get('/checkAllTurnsPlayed', function(req, res) {
   // Open the database
