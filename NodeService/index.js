@@ -73,9 +73,7 @@ app.get('/joinGame', function(req, res) {
       }else{// If the game ID was taken...
         res.json({response_code:0,response_desc:"Game ID is not available."});
       }
-    }
-
-
+    });
     if (err) res.send(err);
     res.json(out);
   });
