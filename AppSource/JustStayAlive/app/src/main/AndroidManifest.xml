@@ -11,12 +11,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--<activity-->
-            <!--android:name=".GameplayActivity"-->
-            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
-            <!--android:theme="@style/FullscreenTheme"-->
-            <!--android:screenOrientation="portrait">-->
-        <!--</activity>-->
+        <activity
+            android:name=".GameplayActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/FullscreenTheme"
+            android:screenOrientation="portrait">
+        </activity>
 
         <activity
             android:name=".LobbyActivity"
