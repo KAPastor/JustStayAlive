@@ -15,7 +15,6 @@ app.get('/createGame', function(req, res) {
   // Grab the gameID and the player name
   var gameID = req.query.gameID;
   var playerName = req.query.playerName;
-
   // We will need to first determine if the game name is already taken, then if not
   // insert the new record into the database
   db.serialize(function() { // serialize
@@ -34,15 +33,17 @@ app.get('/createGame', function(req, res) {
         class_details = getRandomClass()
         db.run("INSERT INTO player VALUES ('"+gameID+"','"+playerName+"','"+class_details.name+"',"+class_details.health+","+
           class_details.consumption+","+class_details.private_stockpile+",0,0)");
-        res.json({response_code:1,class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
+        res.json({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
       }else{// If the game ID was taken...
-        res.json({response_code:0,response_desc:"Game ID is taken."});
+        res.json({response_code:"alert_player",response_desc:"Game ID is taken."});
       }
     });
   });
 });
 
-app.get('/joinGame', function(req, res) {
+
+
+app.get('/joinGame', function(req,  res) {
   // Open the database
   var db = new sqlite3.Database('JustStayAlive.db');
   // Grab the gameID and the player name
@@ -64,23 +65,24 @@ app.get('/joinGame', function(req, res) {
         // Check to see if the player name is taken
         db.all("SELECT * FROM player WHERE name='"+playerName+"'", function(err, rows) {
           if (rows.length>0){
-            res.json({response_code:10,response_desc:"Player name is taken."});
+            res.json({response_code:"alert_player",response_desc:"Player name is taken."});
           }else{
             // Add the player to the game (NEED TO GET A CLASS)
             class_details = getRandomClass()
             db.run("INSERT INTO player VALUES ('"+gameID+"','"+playerName+"','"+class_details.name+"',"+class_details.health+","+
               class_details.consumption+","+class_details.private_stockpile+",0,0)");
-            res.json({response_code:1,class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
-          }
+              res.json({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
+            }
         });
       }else{// If the game ID was taken...
-        res.json({response_code:0,response_desc:"Game ID is not available."});
+        res.json({response_code:"alert_player",response_desc:"Game ID is not available."});
       }
     });
-    if (err) res.send(err);
-    res.json(out);
   });
 });
+
+
+
 
 app.get('/allPlayersJoined', function(req, res) {
   // Open the database

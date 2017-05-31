@@ -47,11 +47,11 @@ public  class JoinGameFragment extends Fragment {
                 String player_name = player_name_et.getText().toString();
                 // DO ERROR CHECKING ON INPUT HERE
 
-                Log.d("Create Game Submit",gameID);
-                Log.d("Create Game Submit",player_name);
+                Log.d("Join Game Submit",gameID);
+                Log.d("Join Game Submit",player_name);
 
                 // Now that we have the player name and game ID request we call the API method
-                String  create_return = myAPI_conn.create_game(rootView,gameID,player_name);
+                String  create_return = myAPI_conn.join_game(rootView,gameID,player_name);
                 // Parse the return string and perform the needed actions
                 try {
                     JSONObject create_game_json = new JSONObject(create_return);
