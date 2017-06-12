@@ -9,6 +9,22 @@ function getRandomClass(){
 
   return {name:"Warrior",health:100,consumption:20,private_stockpile:0};
 }
+
+
+
+app.all('/', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+ });
+
+ app.use(function(req, res, next) {
+   res.header("Access-Control-Allow-Origin", "*");
+   res.header("Access-Control-Allow-Headers", "X-Requested-With");
+   next();
+ });
+
+
 app.get('/createGame', function(req, res) {
   // Open the database
   var db = new sqlite3.Database('JustStayAlive.db');
@@ -33,9 +49,9 @@ app.get('/createGame', function(req, res) {
         class_details = getRandomClass()
         db.run("INSERT INTO player VALUES ('"+gameID+"','"+playerName+"','"+class_details.name+"',"+class_details.health+","+
           class_details.consumption+","+class_details.private_stockpile+",0,0)");
-        res.json({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
+        res.jsonp({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
       }else{// If the game ID was taken...
-        res.json({response_code:"alert_player",response_desc:"Game ID is taken."});
+        res.jsonp({response_code:"alert_player",response_desc:"Game ID is taken."});
       }
     });
   });
@@ -71,11 +87,11 @@ app.get('/joinGame', function(req,  res) {
             class_details = getRandomClass()
             db.run("INSERT INTO player VALUES ('"+gameID+"','"+playerName+"','"+class_details.name+"',"+class_details.health+","+
               class_details.consumption+","+class_details.private_stockpile+",0,0)");
-              res.json({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
+              res.jsonp({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
             }
         });
       }else{// If the game ID was taken...
-        res.json({response_code:"alert_player",response_desc:"Game ID is not available."});
+        res.jsonp({response_code:"alert_player",response_desc:"Game ID is not available."});
       }
     });
   });
