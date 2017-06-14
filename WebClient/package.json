@@ -24,5 +24,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/BlackrockDigital/startbootstrap-freelancer.git"
+  },
+  "dependencies": {
+    "ejs": "^2.5.6",
+    "pug": "^2.0.0-rc.2"
   }
 }
