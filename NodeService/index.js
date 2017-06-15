@@ -34,18 +34,30 @@ app.all('/', function(req, res, next) {
    db.serialize(function() { // serialize
      // ==== Check to see if the camp name already exists =====
      db.all("SELECT * FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
-       console.log(rows.length)
        if (rows.length==1){ // If this is true then the camp name already exists
          // Now we check to see the game status and if it is open for guests we can go ahead and add a guest.
          if (rows[0].status == "accepting_guests"){ // The game has been created but is still accepting guest players
-           response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a guest."};
+           // Apply the update to the player database
+           response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a guest.", response_tag:"guest"};
          }else{
            response = {response_code:"alert_player",response_type:"warning",response_desc:"The camp name already exists. Please try another name."};
          }
+       }else{ // In this case the game does not exist and the player will be the host. We need to make a new game state here.
+         // Create the game state and add host as first player
+         db.run("INSERT INTO gamestate VALUES ('"+camp_name+"',0,0,100,2,10,'Game has been created and awaiting other players to join.')");
+         class_details = {};
+         class_details.name = "test";
+         class_details.health = 1;
+         class_details.consumption = 1;
+         class_details.private_stockpile = 10;
+         db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
+          class_details.consumption+","+class_details.private_stockpile+",0,0)");
+         response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
        }
-       console.log(response)
        res.jsonp(response);
      });
+
+
 
 
 

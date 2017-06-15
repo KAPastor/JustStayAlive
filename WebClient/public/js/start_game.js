@@ -39,7 +39,18 @@ $(function() {
                     $('#success > .alert-'+res.response_type).append('</div>');
                     //clear all fields
                     $('#contactForm').trigger("reset");
-                  }
+                  } else if(res.response_code=='success'){
+                    // In this case we are going to populate the modal with the corresponding information.  The only thing that will be changed is the
+                    // host/guest options.
+
+                    // Check the response description tag
+                    if (res.response_tag=="guest"){
+                      $('#start_game_modal  #camp_name').html('You are a Guest in Camp ' + camp_name);
+
+                    } else if (res.response_tag=="host"){
+                      $('#start_game_modal  #camp_name').html('You are the Host of Camp ' + camp_name);
+                    }
+                   }
 
 
                   // $('#start_game_modal .modal-body').html(res.response_code);
