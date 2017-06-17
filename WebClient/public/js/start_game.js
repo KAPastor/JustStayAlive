@@ -55,7 +55,9 @@ $(function() {
 
                   // $('#start_game_modal .modal-body').html(res.response_code);
                   $('#start_game_modal').modal('show');
-                  console.log(res)
+
+                  // Now make a loop to check the player list every x seconds
+                    setInterval(function(){ doPoll(camp_name); }, 1000);
 
 
 
@@ -88,3 +90,31 @@ $(function() {
 $('#name').focus(function() {
     $('#success').html('');
 });
+
+
+function doPoll(camp_name){
+  setTimeout(function() {
+    $.ajax({
+        url: "http://192.168.0.196:3000/getPlayerList",
+        type: "POST",
+        data: {
+            camp_name: camp_name,
+        },
+        crossDomain:true,
+        dataType : 'jsonp ',
+        contentType: 'application/json',
+        cache: false,
+        success: function(res) {
+          players = res.response_val;
+          // Populate the player list
+          var html = players.map(function (player) {
+            return '<li>' + player.name + ', ' + '</li>';
+          }).join('');
+          $('#start_game_modal  #users').html(html);
+
+        },
+        error: function() {
+        }
+      });
+    },1000);
+}

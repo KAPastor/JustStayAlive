@@ -1,6 +1,8 @@
 // JSA_Service:  This is the web RESTful API that managed the game state of Just Stay Alive
 //Building up the express framework
 var express = require('express');
+var Q = require('q');
+
 var app = express();
 
 var sqlite3 = require('sqlite3');
@@ -25,140 +27,96 @@ app.all('/', function(req, res, next) {
  });
 
 
+
+
+
  // enterGame: Checks and enters the camp as either a host or guest and returns the appropriate info.
+function enterGame(res,req){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  var player_name = req.query.player_name;
+  var response={response_code:"alert_player",response_type:"danger",response_desc:"Unassigned."};
+  db.serialize(function() { // serialize
+    // ==== Check to see if the camp name already exists =====
+    db.all("SELECT * FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      if (rows.length==1){ // If this is true then the camp name already exists
+        // Now we check to see the game status and if it is open for guests we can go ahead and add a guest.
+        if (rows[0].status == "accepting_guests"){ // The game has been created but is still accepting guest players
+          // Check to see if your player name has been taken already
+          db.all("SELECT * FROM player WHERE camp_name='"+camp_name+"' AND name='" + player_name + "'", function(err, rows) {
+             if (rows.length==1){ // In the name is taken send the message back:
+               response = {response_code:"alert_player",response_type:"warning",response_desc:"That player name is already in the camp. Please try another name."};
+               deferred.resolve(response);
+             }else{ //Add the player to the camp
+               db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
+                class_details.consumption+","+class_details.private_stockpile+",0,0)");
+               response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a guest.", response_tag:"guest"};
+               deferred.resolve(response);
+             }
+          });
+        }else{
+          response = {response_code:"alert_player",response_type:"warning",response_desc:"The camp has closed it's doors to guests.  Please try another camp."};
+          deferred.resolve(response);
+
+        }
+      }else{ // In this case the game does not exist and the player will be the host. We need to make a new game state here.
+        // Create the game state and add host as first player
+        db.run("INSERT INTO gamestate VALUES ('"+camp_name+"','accepting_guests',0,100,2,10,'Game has been created and awaiting other players to join.')");
+
+        db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
+         class_details.consumption+","+class_details.private_stockpile+",0,0)");
+        response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
+        deferred.resolve(response);
+      }
+    });
+  });
+  return deferred.promise;
+}
  app.get('/enterGame', function(req, res) {
-   var db = new sqlite3.Database('JustStayAlive.db');
-   var camp_name = req.query.camp_name;
-   var player_name = req.query.player_name;
-   var response={response_code:"alert_player",response_type:"danger",response_desc:"Unassigned."};
-   db.serialize(function() { // serialize
-     // ==== Check to see if the camp name already exists =====
-     db.all("SELECT * FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
-       if (rows.length==1){ // If this is true then the camp name already exists
-         // Now we check to see the game status and if it is open for guests we can go ahead and add a guest.
-         if (rows[0].status == "accepting_guests"){ // The game has been created but is still accepting guest players
-           // Apply the update to the player database
-           response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a guest.", response_tag:"guest"};
-         }else{
-           response = {response_code:"alert_player",response_type:"warning",response_desc:"The camp name already exists. Please try another name."};
-         }
-       }else{ // In this case the game does not exist and the player will be the host. We need to make a new game state here.
-         // Create the game state and add host as first player
-         db.run("INSERT INTO gamestate VALUES ('"+camp_name+"',0,0,100,2,10,'Game has been created and awaiting other players to join.')");
-         class_details = {};
-         class_details.name = "test";
-         class_details.health = 1;
-         class_details.consumption = 1;
-         class_details.private_stockpile = 10;
-         db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
-          class_details.consumption+","+class_details.private_stockpile+",0,0)");
-         response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
-       }
-       res.jsonp(response);
-     });
-
-
-
-
-
-    //  //First see if the game exists
-    //  var q_checkGameID = "SELECT * FROM gamestate WHERE gameID='"+gameID+"'";
-    //  var gameID_available = true;
-    //  db.all("SELECT * FROM gamestate WHERE gameID='"+gameID+"'", function(err, rows) {
-    //    if (rows.length>0){
-    //      gameID_available = false;
-    //    }
-    //    // Now we will check to see if the game state existed and return a message if so
-    //    if (gameID_available){
-    //      // If it is available then we can insert the new game into the database and add the playerName and give a class
-    //      db.run("INSERT INTO gamestate VALUES ('"+gameID+"',0,0,100,2,10,'Game has been created and awaiting other players to join.')");
-    //      // Add the player to the game (NEED TO GET A CLASS)
-    //      class_details = getRandomClass()
-    //      db.run("INSERT INTO player VALUES ('"+gameID+"','"+playerName+"','"+class_details.name+"',"+class_details.health+","+
-    //        class_details.consumption+","+class_details.private_stockpile+",0,0)");
-    //      res.jsonp({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
-    //    }else{// If the game ID was taken...
-    //      res.jsonp({response_code:"alert_player",response_desc:"Game ID is taken."});
-    //    }
-    //  });
+   class_details = {};
+   class_details.name = "test";
+   class_details.health = 1;
+   class_details.consumption = 1;
+   class_details.private_stockpile = 10;
+   enterGame(res,req).then(function(response){
+     res.jsonp(response);
    });
-
  });
+// =============================================================================
 
 
 
-
-app.get('/createGame', function(req, res) {
-  // Open the database
+// getPlayerList ---------------------------------------------------------------
+function getPlayerList(res,req){
+  var deferred  = Q.defer();
   var db = new sqlite3.Database('JustStayAlive.db');
-  // Grab the gameID and the player name
-  var gameID = req.query.gameID;
-  var playerName = req.query.playerName;
-  // We will need to first determine if the game name is already taken, then if not
-  // insert the new record into the database
-  db.serialize(function() { // serialize
-    //First see if the game exists
-    var q_checkGameID = "SELECT * FROM gamestate WHERE gameID='"+gameID+"'";
-    var gameID_available = true;
-    db.all("SELECT * FROM gamestate WHERE gameID='"+gameID+"'", function(err, rows) {
-      if (rows.length>0){
-        gameID_available = false;
-      }
-      // Now we will check to see if the game state existed and return a message if so
-      if (gameID_available){
-        // If it is available then we can insert the new game into the database and add the playerName and give a class
-        db.run("INSERT INTO gamestate VALUES ('"+gameID+"',0,0,100,2,10,'Game has been created and awaiting other players to join.')");
-        // Add the player to the game (NEED TO GET A CLASS)
-        class_details = getRandomClass()
-        db.run("INSERT INTO player VALUES ('"+gameID+"','"+playerName+"','"+class_details.name+"',"+class_details.health+","+
-          class_details.consumption+","+class_details.private_stockpile+",0,0)");
-        res.jsonp({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
-      }else{// If the game ID was taken...
-        res.jsonp({response_code:"alert_player",response_desc:"Game ID is taken."});
-      }
+  var camp_name = req.query.camp_name;
+  var player_list=[];
+  db.serialize(function() {
+    db.all("SELECT name FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_val:rows};
+      deferred.resolve(response);
     });
   });
-});
-
-
-
-app.get('/joinGame', function(req,  res) {
-  // Open the database
-  var db = new sqlite3.Database('JustStayAlive.db');
-  // Grab the gameID and the player name
-  var gameID = req.query.gameID;
-  var playerName = req.query.playerName;
-
-  // We will need to first determine if the game name is already taken, then if not
-  // insert the new record into the database
-  db.serialize(function() { // serialize
-    //First see if the game exists
-    var q_checkGameID = "SELECT * FROM gamestate WHERE gameID='"+gameID+"'";
-    var gameID_available = false;
-    db.all("SELECT * FROM gamestate WHERE gameID='"+gameID+"'", function(err, rows) {
-      if (rows.length>0){
-        gameID_available = true;
-      }
-      // Now we will check to see if the game state existed and return a message if so
-      if (gameID_available){
-        // Check to see if the player name is taken
-        db.all("SELECT * FROM player WHERE name='"+playerName+"'", function(err, rows) {
-          if (rows.length>0){
-            res.json({response_code:"alert_player",response_desc:"Player name is taken."});
-          }else{
-            // Add the player to the game (NEED TO GET A CLASS)
-            class_details = getRandomClass()
-            db.run("INSERT INTO player VALUES ('"+gameID+"','"+playerName+"','"+class_details.name+"',"+class_details.health+","+
-              class_details.consumption+","+class_details.private_stockpile+",0,0)");
-              res.jsonp({response_code:"success",class:{name:class_details.name,health:class_details.health,consumption:class_details.consumption,private_stockpile:class_details.private_stockpile}});
-            }
-        });
-      }else{// If the game ID was taken...
-        res.jsonp({response_code:"alert_player",response_desc:"Game ID is not available."});
-      }
-    });
+  return deferred.promise;
+}
+app.get('/getPlayerList', function(req, res) {
+  getPlayerList(res,req).then(function(response){
+    res.jsonp(response);
   });
 });
+// =============================================================================
+
+
+
+
+
+
+
+
+
+
 
 
 
