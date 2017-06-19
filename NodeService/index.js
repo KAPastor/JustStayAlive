@@ -85,6 +85,28 @@ function enterGame(res,req){
  });
 // =============================================================================
 
+// getCampStatus ---------------------------------------------------------------
+function getCampStatus(res,req){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  var player_list=[];
+  db.serialize(function() {
+    db.all("SELECT status FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      response = {response_code:"success",response_type:"success", response_val:rows};
+      deferred.resolve(response);
+    });
+  });
+  return deferred.promise;
+}
+app.get('/getCampStatus', function(req, res) {
+  getCampStatus(res,req).then(function(response){
+    res.jsonp(response);
+  });
+});
+// =============================================================================
+
+
 
 
 // getPlayerList ---------------------------------------------------------------
@@ -108,7 +130,25 @@ app.get('/getPlayerList', function(req, res) {
 });
 // =============================================================================
 
-
+// startGameSession ---------------------------------------------------------------
+function startGameSession(res,req){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  var player_list=[];
+  db.serialize(function() {
+    db.run("UPDATE gamestate SET status='Game is in session.' WHERE camp_name='"+camp_name+"'");
+    response = {response_code:"success",response_type:"success",response_desc:"Game has started."};
+    deferred.resolve(response);
+  });
+  return deferred.promise;
+}
+app.get('/startGameSession', function(req, res) {
+  startGameSession(res,req).then(function(response){
+    res.jsonp(response);
+  });
+});
+// =============================================================================
 
 
 

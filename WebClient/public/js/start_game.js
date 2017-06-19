@@ -1,6 +1,6 @@
 $(function() {
 
-    $("#contactForm input,#contactForm textarea").jqBootstrapValidation({
+    $("#enterGameForm input,#enterGameForm textarea").jqBootstrapValidation({
         preventSubmit: true,
         submitError: function($form, event, errors) {
             // additional error messages or events
@@ -49,6 +49,10 @@ $(function() {
 
                     } else if (res.response_tag=="host"){
                       $('#start_game_modal  #camp_name').html('You are the Host of Camp ' + camp_name);
+                      $('#start_game_message p').html('When all of the players have joined, please start the game.');
+                      $('#start_game_message button').show();
+                      bind_start_game_button(camp_name,player_name);
+
                     }
                    }
 
@@ -57,7 +61,8 @@ $(function() {
                   $('#start_game_modal').modal('show');
 
                   // Now make a loop to check the player list every x seconds
-                    setInterval(function(){ doPoll(camp_name); }, 1000);
+                  doPoll(camp_name,player_name);
+                  setInterval(function(){ doPoll(camp_name,player_name); }, 500);
 
 
 
@@ -92,7 +97,7 @@ $('#name').focus(function() {
 });
 
 
-function doPoll(camp_name){
+function doPoll(camp_name,player_name){
   setTimeout(function() {
     $.ajax({
         url: "http://192.168.0.196:3000/getPlayerList",
@@ -108,13 +113,66 @@ function doPoll(camp_name){
           players = res.response_val;
           // Populate the player list
           var html = players.map(function (player) {
-            return '<li>' + player.name + ', ' + '</li>';
+            return '<tr><td>' + player.name + '</td></tr>';
           }).join('');
-          $('#start_game_modal  #users').html(html);
+          $('#start_game_modal  #players > tbody').html(html);
+
 
         },
         error: function() {
         }
       });
-    },1000);
+    },500);
+    setTimeout(function() {
+      $.ajax({
+          url: "http://192.168.0.196:3000/getCampStatus",
+          type: "POST",
+          data: {
+              camp_name: camp_name
+          },
+          crossDomain:true,
+          dataType : 'jsonp ',
+          contentType: 'application/json',
+          cache: false,
+          success: function(res) {
+            $.post({
+                url: "/test",
+                type: "POST",
+                data: {
+                    camp_name: camp_name,
+                    player_name: player_name
+                },
+                contentType: 'application/json',
+                cache: false,
+                success: function(res) {
+                },
+                error: function() {
+                }
+              });
+          },
+          error: function() {
+          }
+        });
+      },500);
 }
+
+function bind_start_game_button(camp_name,player_name){
+  $('#start_game_message button').click(function(){
+    $.ajax({
+        url: "http://192.168.0.196:3000/startGameSession",
+        type: "POST",
+        data: {
+            camp_name: camp_name,
+        },
+        crossDomain:true,
+        dataType : 'jsonp ',
+        contentType: 'application/json',
+        cache: false,
+        success: function(res) {
+        },
+        error: function() {
+        }
+      });
+  })
+
+};

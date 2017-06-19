@@ -59,8 +59,6 @@ html(lang='en')
               a(href='#how_to_play') How To Play
             li.page-scroll
               a(href='#character_classes') Character Classes
-            li.page-scroll
-              a(href='#dev_api_test') DEV API Test
         // /.navbar-collapse
       // /.container-fluid
     // Header
@@ -81,7 +79,7 @@ html(lang='en')
             hr
         .row
           .col-lg-8.col-lg-offset-2
-            form#contactForm(name='sentMessage', novalidate='')
+            form#enterGameForm(name='sentMessage', novalidate='')
               .row.control-group
                 .form-group.col-xs-12.floating-label-form-group.controls
                   label(for='camp_name') Camp Name
@@ -97,7 +95,7 @@ html(lang='en')
               .row
                 .form-group.col-xs-12.col-lg-12
                   button.btn.btn-success.btn-lg(type='submit') Enter the Game
-    // About Section
+
     section#how_to_play.success
       .container
         .row
@@ -106,21 +104,21 @@ html(lang='en')
             hr
         .row
           .col-sm-4.portfolio-item
-            a.portfolio-link(href='#join_create_game_modal', data-toggle='modal')
+            a.portfolio-link(href='#howo_startgame', data-toggle='modal')
               .caption
                 .caption-content
                   | STARTING THE GAME
                   i.fa.fa-search-plus.fa-3x
               img.img-responsive(src='/public/img/portfolio/cabin.png', alt='Cabin')
           .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal2', data-toggle='modal')
+            a.portfolio-link(href='#howo_playerturn', data-toggle='modal')
               .caption
                 .caption-content
                   | PLAYING YOUR TURN
                   i.fa.fa-search-plus.fa-3x
               img.img-responsive(src='/public/img/portfolio/cake.png', alt='Slice of cake')
           .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal3', data-toggle='modal')
+            a.portfolio-link(href='#howo_wingame', data-toggle='modal')
               .caption
                 .caption-content
                   | WINNING THE GAME
@@ -135,21 +133,24 @@ html(lang='en')
             hr
         .row
           .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal4', data-toggle='modal')
+            a.portfolio-link(href='#character_thief', data-toggle='modal')
               .caption
                 .caption-content
+                  | THIEF
                   i.fa.fa-search-plus.fa-3x
               img.img-responsive(src='/public/img/portfolio/game.png', alt='Game controller')
           .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal5', data-toggle='modal')
+            a.portfolio-link(href='#character_mage', data-toggle='modal')
               .caption
                 .caption-content
+                  | MAGE
                   i.fa.fa-search-plus.fa-3x
               img.img-responsive(src='/public/img/portfolio/safe.png', alt='Safe')
           .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal6', data-toggle='modal')
+            a.portfolio-link(href='#character_warrior', data-toggle='modal')
               .caption
                 .caption-content
+                  | WARRIOR
                   i.fa.fa-search-plus.fa-3x
               img.img-responsive(src='/public/img/portfolio/submarine.png', alt='Submarine')
     
@@ -157,52 +158,28 @@ html(lang='en')
       .footer-above
         .container
           .row
-            .footer-col.col-md-4
+            .footer-col.col-md-6
               h3 Location
               p
-                | 3481 Melrose Place
+                | 2239 MacLennan Drive
                 br
-                | Beverly Hills, CA 90210
-            .footer-col.col-md-4
+                | Oakville, ON, Canada L6H 5K2
+            .footer-col.col-md-6
               h3 Around the Web
               ul.list-inline
-                li
-                  a.btn-social.btn-outline(href='#')
-                    span.sr-only Facebook
-                    i.fa.fa-fw.fa-facebook
-                li
-                  a.btn-social.btn-outline(href='#')
-                    span.sr-only Google Plus
-                    i.fa.fa-fw.fa-google-plus
-                li
-                  a.btn-social.btn-outline(href='#')
-                    span.sr-only Twitter
-                    i.fa.fa-fw.fa-twitter
-                li
-                  a.btn-social.btn-outline(href='#')
-                    span.sr-only Linked In
-                    i.fa.fa-fw.fa-linkedin
-                li
-                  a.btn-social.btn-outline(href='#')
-                    span.sr-only Dribble
-                    i.fa.fa-fw.fa-dribbble
-            .footer-col.col-md-4
-              h3 About Freelancer
-              p
-                | Freelance is a free to use, open source Bootstrap theme created by
-                a(href='http://startbootstrap.com') Start Bootstrap
-                | .
+                //- li
+                //-   a.btn-social.btn-outline(href='#')
+                //-     span.sr-only Facebook
+                //-     i.fa.fa-fw.fa-facebook
       .footer-below
         .container
           .row
             .col-lg-12
-              | Copyright © Your Website 2016
+              | Copyright © Just Stay Alive 2017
     // Scroll to Top Button (Only visible on small and extra-small screen sizes)
     .scroll-top.page-scroll.hidden-sm.hidden-xs.hidden-lg.hidden-md
       a.btn.btn-primary(href='#page-top')
         i.fa.fa-chevron-up
-          
-          
           
           
     // Join/Create Game Modal
@@ -215,28 +192,17 @@ html(lang='en')
           .row
             .col-lg-8.col-lg-offset-2
               .modal-body
-                h2#camp_name TMP
+                h2#camp_name 
                 hr
+                #start_game_message
+                  p
+                    | Waiting for the Host to start the game.
+                  button.btn.btn-info(type='button', style='display:none;', id='start_game_button') Start the game
                   
-                  
-                p#host_or_guest
-                  | TMP
-                img.img-responsive.img-centered(src='/public/img/portfolio/cabin.png', alt='')
-                p#users
-                  | 
-                ul.list-inline.item-details
-                  li
-                    | Client:
-                    strong
-                      a(href='http://startbootstrap.com') Start Bootstrap
-                  li
-                    | Date:
-                    strong
-                      a(href='http://startbootstrap.com') April 2014
-                  li
-                    | Service:
-                    strong
-                      a(href='http://startbootstrap.com') Web Development
-                button.btn.btn-default(type='button', data-dismiss='modal')
-                  i.fa.fa-times
-                  |  Close
+                table.table.table-bordered(id='players')
+                  thead
+                    tr
+                      th Players in Camp
+                  tbody
+
+              
