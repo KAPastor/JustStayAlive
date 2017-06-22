@@ -93,7 +93,7 @@ function getCampStatus(res,req){
   var player_list=[];
   db.serialize(function() {
     db.all("SELECT status FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
-      response = {response_code:"success",response_type:"success", response_val:rows};
+      response = {response_code:"success",response_type:"success", response_val:rows[0]};
       deferred.resolve(response);
     });
   });

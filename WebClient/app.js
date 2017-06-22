@@ -1,6 +1,7 @@
 var express = require("express");
 var app     = express();
 var path    = require("path");
+var bodyParser = require('body-parser');
 
 // var dblite = require("dblite");
 // var db = dblite("web.db");
@@ -10,6 +11,7 @@ var path    = require("path");
 
 
 app.use("/public", express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -21,7 +23,8 @@ app.get('/',function(req,res){
 
 
 app.post('/test',function(req,res){
-  res.render('gameview', {results: "poo"});
+  console.log(req.body)
+  res.render('gameview', {camp_name: req.body.camp_name,player_name: req.body.player_name});
 });
 
 

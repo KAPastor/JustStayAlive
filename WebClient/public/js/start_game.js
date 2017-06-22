@@ -1,3 +1,6 @@
+var player_timeout;
+var status_timeout;
+var poll_interval;
 $(function() {
 
     $("#enterGameForm input,#enterGameForm textarea").jqBootstrapValidation({
@@ -62,7 +65,7 @@ $(function() {
 
                   // Now make a loop to check the player list every x seconds
                   doPoll(camp_name,player_name);
-                  setInterval(function(){ doPoll(camp_name,player_name); }, 500);
+                  poll_interval = setInterval(function(){ doPoll(camp_name,player_name); }, 500);
 
 
 
@@ -98,7 +101,7 @@ $('#name').focus(function() {
 
 
 function doPoll(camp_name,player_name){
-  setTimeout(function() {
+  player_timeout =  setTimeout(function() {
     $.ajax({
         url: "http://192.168.0.196:3000/getPlayerList",
         type: "POST",
@@ -123,7 +126,7 @@ function doPoll(camp_name,player_name){
         }
       });
     },500);
-    setTimeout(function() {
+     status_timeout = setTimeout(function() {
       $.ajax({
           url: "http://192.168.0.196:3000/getCampStatus",
           type: "POST",
@@ -131,24 +134,38 @@ function doPoll(camp_name,player_name){
               camp_name: camp_name
           },
           crossDomain:true,
-          dataType : 'jsonp ',
+          dataType : 'jsonp',
           contentType: 'application/json',
           cache: false,
           success: function(res) {
-            $.post({
-                url: "/test",
-                type: "POST",
-                data: {
-                    camp_name: camp_name,
-                    player_name: player_name
-                },
-                contentType: 'application/json',
-                cache: false,
-                success: function(res) {
-                },
-                error: function() {
-                }
-              });
+            if (res.response_val.status == "Game is in session."){
+              console.log("Game is in session.  Load the game page.")
+              console.log(camp_name);
+              console.log(player_name);
+
+              clearTimeout(status_timeout);
+              clearTimeout(player_timeout);
+              clearInterval(poll_interval);
+              $.ajax({
+                  url: "/test",
+                  type: "POST",
+                  data: JSON.stringify({
+                      camp_name: camp_name,
+                      player_name: player_name
+                  }),
+                  dataType : 'html',
+                  contentType: 'application/json',
+                  cache: false,
+                  success: function(res) {
+                    console.log(res)
+                    var newDoc = document.open("text/html", "replace");
+                    newDoc.write(res);
+                    newDoc.close();
+                  },
+                  error: function() {
+                  }
+                });
+              }
           },
           error: function() {
           }
