@@ -38,66 +38,36 @@ html(lang='en')
       $("[name='my-checkbox']").bootstrapSwitch();
       });
   body#page-top.index
+    section#game_summary
+      .container
+        .row
+          .col-lg-4.text-center
+            h2 Community Overview
+            hr
+          .col-lg-4.text-center
+            h2 Player overview
+            hr
+          .col-lg-4.text-center
+            h2 Turns and Other info
+            hr
     // Navigation
     nav#mainNav.navbar.navbar-default.navbar-fixed-top.navbar-custom
       .container
-        // Brand and toggle get grouped for better mobile display
-        .navbar-header.page-scroll
-          button.navbar-toggle(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
-            span.sr-only Toggle navigation
-            |  Menu
-            i.fa.fa-bars
-          a.navbar-brand(href='#page-top') Just Stay Alive Web Client
-        // Collect the nav links, forms, and other content for toggling
-        #bs-example-navbar-collapse-1.collapse.navbar-collapse
-          ul.nav.navbar-nav.navbar-right
-            li.hidden
-              a(href='#page-top')
-            li.page-scroll
-              a(href='#join_create_game') Join/Create Game
-            li.page-scroll
-              a(href='#how_to_play') How To Play
-            li.page-scroll
-              a(href='#character_classes') Character Classes
-            li.page-scroll
-              a(href='#dev_api_test') DEV API Test
-        // /.navbar-collapse
-      // /.container-fluid
-    // Header
-    header
-      #maincontent.container(tabindex='-1')
-        .row
-          .col-lg-12
-            img.img-responsive(src='/public/img/profile.png', alt='')
-            .intro-text
-              h1.name #{camp_name}
-              hr.star-light
-              span.skills This is a placeholder for the stuff.
-    section#join_create_game
+        a.navbar-brand(href='#page-top') Welcome to Camp #{camp_name}
+  
+    section#game_summary
       .container
         .row
-          .col-lg-12.text-center
-            h2 Join / Create a Game
+          .col-lg-4.text-center
+            h2 Community Overview
             hr
-        .row
-          .col-lg-8.col-lg-offset-2
-            form#contactForm(name='sentMessage', novalidate='')
-              .row.control-group
-                .form-group.col-xs-12.floating-label-form-group.controls
-                  label(for='camp_name') Camp Name
-                  input#camp_name.form-control(type='text', placeholder='Camp Name', required='', data-validation-required-message='Please enter the camp name.')
-                  p.help-block.text-danger
-              .row.control-group
-                .form-group.col-xs-12.floating-label-form-group.controls
-                  label(for='player_name') Player Name
-                  input#player_name.form-control(type='text', placeholder='Player Name', required='', data-validation-required-message='Please enter your player name.')
-                  p.help-block.text-danger
-              br
-              #success
-              .row
-                .form-group.col-xs-12.col-lg-12
-                  button.btn.btn-success.btn-lg(type='submit') Enter the Game
-    // About Section
+          .col-lg-4.text-center
+            h2 Player overview
+            hr
+          .col-lg-4.text-center
+            h2 Turns and Other info
+            hr
+      
     section#how_to_play.success
       .container
         .row
@@ -153,25 +123,7 @@ html(lang='en')
                   i.fa.fa-search-plus.fa-3x
               img.img-responsive(src='/public/img/portfolio/submarine.png', alt='Submarine')
     //
-      <!-- About Section
-    section#dev_api_test.success
-      .container
-        .row
-          .col-lg-12.text-center
-            h2 About
-            hr.star-light
-        .row
-          .col-lg-4.col-lg-offset-2
-            p
-              | Freelancer is a free bootstrap theme created by Start Bootstrap. The download includes the complete source files including HTML, CSS, and JavaScript as well as optional LESS stylesheets for easy customization.
-          .col-lg-4
-            p
-              | Whether you're a student looking to showcase your work, a professional looking to attract clients, or a graphic artist looking to share your projects, this template is the perfect starting point!
-          .col-lg-8.col-lg-offset-2.text-center
-            a.btn.btn-lg.btn-outline(href='#')
-              i.fa.fa-download
-              |  Download Theme
-    |  -->
+  
     // Footer
     footer.text-center
       .footer-above
