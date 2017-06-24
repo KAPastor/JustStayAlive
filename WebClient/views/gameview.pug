@@ -30,27 +30,17 @@ html(lang='en')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js')
     // Contact Form JavaScript
     script(src='/public/js/jqBootstrapValidation.js')
-    script(src='/public/js/start_game.js')
+    script(src='/public/js/gameview.js')
     // Theme JavaScript
     script(src='/public/js/freelancer.js')
     script.
+      var camp_name = "#{camp_name}";
+      var player_name = "#{player_name}";
+
       $( document ).ready(function() {
       $("[name='my-checkbox']").bootstrapSwitch();
       });
   body#page-top.index
-    section#game_summary
-      .container
-        .row
-          .col-lg-4.text-center
-            h2 Community Overview
-            hr
-          .col-lg-4.text-center
-            h2 Player overview
-            hr
-          .col-lg-4.text-center
-            h2 Turns and Other info
-            hr
-    // Navigation
     nav#mainNav.navbar.navbar-default.navbar-fixed-top.navbar-custom
       .container
         a.navbar-brand(href='#page-top') Welcome to Camp #{camp_name}
@@ -58,71 +48,61 @@ html(lang='en')
     section#game_summary
       .container
         .row
-          .col-lg-4.text-center
-            h2 Community Overview
+          .col-lg-6.text-center#community_dashboard
+            h2 Community
             hr
-          .col-lg-4.text-center
-            h2 Player overview
+            .row
+              .col-lg-6.text-center
+                h3 Community Food: 10
+                hr
+              .col-lg-6.text-center
+                h3 Day: 1
+                hr
+            .row
+              table.table.table-bordered(id='players')
+                thead
+                  tr
+                    th Campmates
+                    th Turn Status
+                tbody  
+
+
+
+          .col-lg-6.text-center#player_dashboard
+            h2 Player
             hr
-          .col-lg-4.text-center
-            h2 Turns and Other info
-            hr
-      
-    section#how_to_play.success
+            .row
+              .col-lg-6.text-center
+                h3 Private Food: 30
+                hr
+              .col-lg-6.text-center
+                h3 Health: 100
+                hr
+            .row
+              .col-lg-6.text-center
+                h3 Consumption: 10/Turn
+                hr
+              .col-lg-6.text-center
+                h3 Class: Theif
+                hr
+                  
+    section#player_actions
       .container
         .row
-          .col-lg-12.text-center
-            h2 How To Play
+          .col-lg-6.text-center
+            button.btn.btn-info.btn-block(type='button') Collection 2 Food For Yourself
+            hr
+          .col-lg-6.text-center
+            button.btn.btn-info.btn-block(type='button') Collection 8 Food For The Community
             hr
         .row
-          .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal1', data-toggle='modal')
-              .caption
-                .caption-content
-                  | STARTING THE GAME
-                  i.fa.fa-search-plus.fa-3x
-              img.img-responsive(src='/public/img/portfolio/cabin.png', alt='Cabin')
-          .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal2', data-toggle='modal')
-              .caption
-                .caption-content
-                  | PLAYING YOUR TURN
-                  i.fa.fa-search-plus.fa-3x
-              img.img-responsive(src='/public/img/portfolio/cake.png', alt='Slice of cake')
-          .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal3', data-toggle='modal')
-              .caption
-                .caption-content
-                  | WINNING THE GAME
-                  i.fa.fa-search-plus.fa-3x
-              img.img-responsive(src='/public/img/portfolio/circus.png', alt='Circus tent')
-    // Contact Section
-    section#character_classes
-      .container
-        .row
-          .col-lg-12.text-center
-            h2 Character Classes
+          .col-lg-6.text-center
+            button.btn.btn-info.btn-block(type='button') Attack Player for 2 Damage
             hr
-        .row
-          .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal4', data-toggle='modal')
-              .caption
-                .caption-content
-                  i.fa.fa-search-plus.fa-3x
-              img.img-responsive(src='/public/img/portfolio/game.png', alt='Game controller')
-          .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal5', data-toggle='modal')
-              .caption
-                .caption-content
-                  i.fa.fa-search-plus.fa-3x
-              img.img-responsive(src='/public/img/portfolio/safe.png', alt='Safe')
-          .col-sm-4.portfolio-item
-            a.portfolio-link(href='#portfolioModal6', data-toggle='modal')
-              .caption
-                .caption-content
-                  i.fa.fa-search-plus.fa-3x
-              img.img-responsive(src='/public/img/portfolio/submarine.png', alt='Submarine')
-    //
+          .col-lg-6.text-center
+            button.btn.btn-info.btn-block(type='button') Heal Player for 2 Health
+            hr
+
   
     // Footer
     footer.text-center

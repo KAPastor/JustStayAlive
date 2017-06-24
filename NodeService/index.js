@@ -116,8 +116,8 @@ function getPlayerList(res,req){
   var camp_name = req.query.camp_name;
   var player_list=[];
   db.serialize(function() {
-    db.all("SELECT name FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
-      response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_val:rows};
+    db.all("SELECT name,turn_status FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      response = {response_code:"success",response_type:"success",response_desc:"", response_val:rows};
       deferred.resolve(response);
     });
   });
