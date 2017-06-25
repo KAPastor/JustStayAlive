@@ -1,19 +1,30 @@
-poll_interval = setInterval(function(){ refresh_gameview(camp_name,player_name); }, 500);
+poll_interval = setInterval(function(){ refresh_gameview(camp_name,player_name); }, 1000);
 
 
 function refresh_gameview(){
   $.ajax({
-      url: "http://192.168.0.196:3000/getPlayerList",
+      url: "http://192.168.0.196:3000/refreshGameview",
       type: "POST",
       data: {
           camp_name: camp_name,
+          player_name: player_name
       },
       crossDomain:true,
       dataType : 'jsonp ',
       contentType: 'application/json',
       cache: false,
       success: function(res) {
-        console.log(res.response_val)
+        // Update the status of the gameview
+        $('#player_food').html('Private Food: '+res.player_info.private_stockpile);
+        $('#player_health').html('Health: '+res.player_info.health);
+        $('#player_consumption').html('Consumption: '+res.player_info.consumption + '/Turn');
+        $('#player_class').html('Class: '+res.player_info.class);
+
+        // Update the player list
+        var html = res.player_list.map(function (player) {
+          return '<tr><td>' + player.name + '</td><td>' + player.status + '</td></tr>';
+        }).join('');
+        $('#players > tbody').html(html);
       },
       error: function() {
       }

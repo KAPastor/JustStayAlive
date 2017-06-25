@@ -26,6 +26,67 @@ app.all('/', function(req, res, next) {
    next();
  });
 
+// refreshGameview : Refreshes the visual display on the client side
+function refreshGameview(req,res){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  var player_name = req.query.player_name;
+  var player_list;
+  var player_info;
+
+   rgv_playerList(req,res).then(function(player_list){
+     db.serialize(function() {
+       // Now we will get the players current status (class,health,consumption,private_stockpile)
+       db.all("SELECT class,health,consumption,private_stockpile FROM player WHERE camp_name='"+camp_name+"' AND name='"+player_name+"'" , function(err, rows) {
+         console.log(rows);
+         player_info = rows[0];
+         response = {response_code:"success",response_type:"success",response_desc:"Good",player_info:player_info,player_list:player_list};
+         deferred.resolve(response);
+       });
+     });
+   });
+   return deferred.promise;
+
+};
+// Get player list
+function rgv_playerList(req,res){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  db.serialize(function() {
+    db.all("SELECT name,status FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      response =rows;
+      deferred.resolve(response);
+    });
+  });
+  return deferred.promise;
+};
+// Get player list
+function rgv_communityInfo(req,res){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  db.serialize(function() {
+    db.all("SELECT group_stockpile,turn_number FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      response=rows[0];
+      deferred.resolve(response);
+    });
+  });
+  return deferred.promise;
+};
+
+app.get('/refreshGameview', function(req, res) {
+  refreshGameview(req,res).then(function(response){
+    res.jsonp(response);
+  });
+});
+//==============================================================================
+
+
+
+
+
 
 
 
@@ -116,7 +177,7 @@ function getPlayerList(res,req){
   var camp_name = req.query.camp_name;
   var player_list=[];
   db.serialize(function() {
-    db.all("SELECT name,turn_status FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
+    db.all("SELECT name FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
       response = {response_code:"success",response_type:"success",response_desc:"", response_val:rows};
       deferred.resolve(response);
     });
