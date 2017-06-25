@@ -20,6 +20,9 @@ function refresh_gameview(){
         $('#player_consumption').html('Consumption: '+res.player_info.consumption + '/Turn');
         $('#player_class').html('Class: '+res.player_info.class);
 
+        $('#community_food').html('Community Food: '+res.community_info.group_stockpile);
+        $('#community_day').html('Day: '+res.community_info.turn_number);
+
         // Update the player list
         var html = res.player_list.map(function (player) {
           return '<tr><td>' + player.name + '</td><td>' + player.status + '</td></tr>';

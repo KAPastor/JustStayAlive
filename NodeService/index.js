@@ -28,6 +28,7 @@ app.all('/', function(req, res, next) {
 
 // refreshGameview : Refreshes the visual display on the client side
 function refreshGameview(req,res){
+  var dataset={};
   var deferred  = Q.defer();
   var db = new sqlite3.Database('JustStayAlive.db');
   var camp_name = req.query.camp_name;
@@ -35,41 +36,58 @@ function refreshGameview(req,res){
   var player_list;
   var player_info;
 
-   rgv_playerList(req,res).then(function(player_list){
-     db.serialize(function() {
-       // Now we will get the players current status (class,health,consumption,private_stockpile)
-       db.all("SELECT class,health,consumption,private_stockpile FROM player WHERE camp_name='"+camp_name+"' AND name='"+player_name+"'" , function(err, rows) {
-         console.log(rows);
-         player_info = rows[0];
-         response = {response_code:"success",response_type:"success",response_desc:"Good",player_info:player_info,player_list:player_list};
-         deferred.resolve(response);
-       });
-     });
-   });
+
+  rgv_playerList(req,res).then(function(response){
+    dataset.player_list = response.player_list;
+    return rgv_communityInfo(req,res);
+  }).then(function(response){
+    dataset.community_info = response.community_info;
+    return rgv_playerInfo(req,res);
+  }).then(function(response){
+    dataset.player_info = response.player_info;
+    deferred.resolve(dataset);
+  });
+
    return deferred.promise;
 
 };
 // Get player list
-function rgv_playerList(req,res){
+function rgv_playerInfo(req,res){
   var deferred  = Q.defer();
   var db = new sqlite3.Database('JustStayAlive.db');
   var camp_name = req.query.camp_name;
+  var player_name = req.query.player_name;
+  var response={};
   db.serialize(function() {
-    db.all("SELECT name,status FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
-      response =rows;
+    db.all("SELECT class,health,consumption,private_stockpile FROM player WHERE camp_name='"+camp_name+"' AND name='"+player_name+"'" , function(err, rows) {
+      response.player_info=rows[0];
+      player_info = rows[0];
       deferred.resolve(response);
     });
   });
   return deferred.promise;
 };
-// Get player list
+function rgv_playerList(req,res){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  var response={};
+  db.serialize(function() {
+    db.all("SELECT name,status FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      response.player_list=rows;
+      deferred.resolve(response);
+    });
+  });
+  return deferred.promise;
+};
 function rgv_communityInfo(req,res){
   var deferred  = Q.defer();
   var db = new sqlite3.Database('JustStayAlive.db');
   var camp_name = req.query.camp_name;
+  var response={};
   db.serialize(function() {
     db.all("SELECT group_stockpile,turn_number FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
-      response=rows[0];
+      response.community_info=rows[0];
       deferred.resolve(response);
     });
   });
