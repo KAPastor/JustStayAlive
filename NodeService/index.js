@@ -1,3 +1,15 @@
+Array.prototype.allValuesSame = function() {
+
+    for(var i = 1; i < this.length; i++)
+    {
+        if(this[i] !== this[0])
+            return false;
+    }
+
+    return true;
+}
+
+
 // JSA_Service:  This is the web RESTful API that managed the game state of Just Stay Alive
 //Building up the express framework
 var express = require('express');
@@ -166,11 +178,37 @@ function enterGame(res,req){
 
 
 app.get('/updatePlayerAction', function(req, res) {
-  updatePlayerAction(res,req).then(function(response){
+  updatePlayerAction(req,res).then(function(response){
+    // Check to see if all are ready and incriment the turn
+    return checkAllReady(req, res);
+  }).then(function(response){
     res.jsonp(response);
   });
 });
-function updatePlayerAction(res,req){
+function checkAllReady(req,res){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  db.serialize(function() {
+    db.all("SELECT status FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      var valueArr = rows.map(function(item){ return item.status});
+      var ready_array = valueArr.filter(function(item){
+        return item=='Ready';
+      });
+      if (ready_array.length == valueArr.length){
+        // Now we can do all of the advancing logic
+        db.run("UPDATE gamestate SET turn_number=1 WHERE camp_name='" +camp_name+"'");
+        response = 1;
+        deferred.resolve(response);
+      }
+
+
+    });
+  });
+  return deferred.promise;
+
+};
+function updatePlayerAction(req, res){
   var deferred  = Q.defer();
   var db = new sqlite3.Database('JustStayAlive.db');
   var camp_name = req.query.camp_name;
@@ -180,8 +218,8 @@ function updatePlayerAction(res,req){
     db.run("UPDATE player SET status='Ready', action='" + action + "' WHERE name='"+player_name+"' AND camp_name='" +camp_name+"'");
     response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
     deferred.resolve(response);
-
   });
+  return deferred.promise;
 
 };
 
