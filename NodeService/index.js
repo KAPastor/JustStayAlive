@@ -129,7 +129,7 @@ function enterGame(res,req){
                deferred.resolve(response);
              }else{ //Add the player to the camp
                db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
-                class_details.consumption+","+class_details.private_stockpile+",0,0)");
+                class_details.consumption+","+class_details.private_stockpile+",'Waiting','')");
                response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a guest.", response_tag:"guest"};
                deferred.resolve(response);
              }
@@ -144,7 +144,7 @@ function enterGame(res,req){
         db.run("INSERT INTO gamestate VALUES ('"+camp_name+"','accepting_guests',0,100,2,10,'Game has been created and awaiting other players to join.')");
 
         db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
-         class_details.consumption+","+class_details.private_stockpile+",0,0)");
+         class_details.consumption+","+class_details.private_stockpile+",'Waiting','')");
         response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
         deferred.resolve(response);
       }
@@ -163,6 +163,27 @@ function enterGame(res,req){
    });
  });
 // =============================================================================
+
+
+app.get('/updatePlayerAction', function(req, res) {
+  updatePlayerAction(res,req).then(function(response){
+    res.jsonp(response);
+  });
+});
+function updatePlayerAction(res,req){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  var player_name = req.query.player_name;
+  var action = req.query.action;
+  db.serialize(function() {
+    db.run("UPDATE player SET status='Ready', action='" + action + "' WHERE name='"+player_name+"' AND camp_name='" +camp_name+"'");
+    response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
+    deferred.resolve(response);
+
+  });
+
+};
 
 // getCampStatus ---------------------------------------------------------------
 function getCampStatus(res,req){
