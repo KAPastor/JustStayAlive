@@ -196,18 +196,81 @@ function checkAllReady(req,res){
         return item=='Ready';
       });
       if (ready_array.length == valueArr.length){
-        // Now we can do all of the advancing logic
-        db.run("UPDATE gamestate SET turn_number=1 WHERE camp_name='" +camp_name+"'");
-        response = 1;
-        deferred.resolve(response);
+        advanceTurn(req,res).then(function(response){
+          response = 1;
+          deferred.resolve(response);
+        });
+        // // Now we can do all of the advancing logic!!!!
+        // db.run("UPDATE gamestate SET turn_number=1 WHERE camp_name='" +camp_name+"'");
+        // db.run("UPDATE player SET status='Waiting', action='' WHERE AND camp_name='" +camp_name+"'");
+
       }
-
-
     });
   });
   return deferred.promise;
+};
+function at_Heal(db,camp_name,action){
+  var deferred  = Q.defer();
+
+  db.serialize(function() {
+    db.all("SELECT action FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
+      // Loop over the action and look for a string 'heal_player'
+      rows.forEach(function(element){
+        var res = element.action.split(":");
+        if (res.length==2){
+          // Check for attack of heal:
+          if (res[0]=='heal_player'){
+            // Do the action
+            db.all("SELECT health FROM player WHERE camp_name='"+camp_name+"' AND name='"+res[1]+"'" , function(err, rows) {
+
+
+              db.run("UPDATE player SET health="+(parseInt(rows[0].health)+2)+", action='' WHERE AND camp_name='" +camp_name+"' AND name='"+res[1]+"'");
+              deferred.resolve(response);
+            });
+          }
+        }
+      });
+      deferred.resolve(response);
+    });
+  });
+  return deferred.promise;
+}
+function advanceTurn(req,res){
+  var deferred  = Q.defer();
+  var db = new sqlite3.Database('JustStayAlive.db');
+  var camp_name = req.query.camp_name;
+  var player_name = req.query.player_name;
+  var action = req.query.action;
+
+  // Steps for turn advancement:
+  // 1. Heal first
+  // 2. Collect private food
+  // 3. Collect community food
+  // 4. Apply group consumption
+  // 5. Reduce private stockpile if not enough community food
+  // 6. Reduce health if no food
+  // 7. Apply attack
+
+  at_Heal(db,camp_name,action);
+
+
+
+  // rgv_playerList(req,res).then(function(response){
+  //   dataset.player_list = response.player_list;
+  //   return rgv_communityInfo(req,res);
+  // }).then(function(response){
+  //   dataset.community_info = response.community_info;
+  //   return rgv_playerInfo(req,res);
+  // }).then(function(response){
+  //   dataset.player_info = response.player_info;
+  //   deferred.resolve(dataset);
+  // });
+
+   return deferred.promise;
 
 };
+
+
 function updatePlayerAction(req, res){
   var deferred  = Q.defer();
   var db = new sqlite3.Database('JustStayAlive.db');
@@ -216,7 +279,7 @@ function updatePlayerAction(req, res){
   var action = req.query.action;
   db.serialize(function() {
     db.run("UPDATE player SET status='Ready', action='" + action + "' WHERE name='"+player_name+"' AND camp_name='" +camp_name+"'");
-    response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
+    response = {response_code:"success",response_type:"success",response_desc:"", response_tag:""};
     deferred.resolve(response);
   });
   return deferred.promise;

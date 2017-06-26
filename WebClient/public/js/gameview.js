@@ -22,13 +22,111 @@ $(document).ready(function(){
         error: function() {
         }
       });
-
   });
+
+  $('#community_collect').click(function(){
+    $(':button').prop('disabled', true);
+    $.ajax({
+        url: "http://192.168.0.196:3000/updatePlayerAction",
+        type: "POST",
+        data: {
+            camp_name: camp_name,
+            player_name: player_name,
+            action: 'community_collect'
+        },
+        crossDomain:true,
+        dataType : 'jsonp ',
+        contentType: 'application/json',
+        cache: false,
+        success: function(res) {
+        },
+        error: function() {
+        }
+      });
+  });
+
+
+  $('#attack_player').click(function(){
+    // Pop up a modal to select who to attack
+    var pl = player_list.map(function (player) {
+      return '<button class="btn btn-info btn-block action-button" type="button">'+player+'</button>';
+    }).join('');
+    $('#gameview_modal_desc').html(pl);
+
+    $('#gameview_modal_title').text('Select a player to attack.');
+
+    // Bind the click events:
+    $('.action-button').click(function(){
+      attack_player = $(this).text();
+      action_string = 'attack_player:' + attack_player;
+      $(':button').prop('disabled', true);
+      $('#gameview_modal').modal('hide');
+
+      $.ajax({
+          url: "http://192.168.0.196:3000/updatePlayerAction",
+          type: "POST",
+          data: {
+              camp_name: camp_name,
+              player_name: player_name,
+              action: action_string
+          },
+          crossDomain:true,
+          dataType : 'jsonp ',
+          contentType: 'application/json',
+          cache: false,
+          success: function(res) {
+          },
+          error: function() {
+          }
+        });
+    })
+    $('#gameview_modal').modal('show');
+  });
+
+  $('#heal_player').click(function(){
+    // Pop up a modal to select who to attack
+    var pl = player_list.map(function (player) {
+      return '<button class="btn btn-info btn-block action-button" type="button">'+player+'</button>';
+    }).join('');
+    $('#gameview_modal_desc').html(pl);
+
+    $('#gameview_modal_title').text('Select a player to heal.');
+
+    // Bind the click events:
+    $('.action-button').click(function(){
+      attack_player = $(this).text();
+      action_string = 'heal_player:' + attack_player;
+      $(':button').prop('disabled', true);
+      $('#gameview_modal').modal('hide');
+
+      $.ajax({
+          url: "http://192.168.0.196:3000/updatePlayerAction",
+          type: "POST",
+          data: {
+              camp_name: camp_name,
+              player_name: player_name,
+              action: action_string
+          },
+          crossDomain:true,
+          dataType : 'jsonp ',
+          contentType: 'application/json',
+          cache: false,
+          success: function(res) {
+          },
+          error: function() {
+          }
+        });
+    })
+    $('#gameview_modal').modal('show');
+  });
+
+
 });
 
 poll_interval = setInterval(function(){ refresh_gameview(camp_name,player_name); }, 1000);
 
 var current_day=0;
+var player_list;
 function refresh_gameview(){
   $.ajax({
       url: "http://192.168.0.196:3000/refreshGameview",
@@ -54,6 +152,10 @@ function refresh_gameview(){
           current_day=res.community_info.turn_number;
           $(':button').prop('disabled', false);
         }
+        player_list = res.player_list.map(function (player) {return player.name});
+
+
+
 
         var html = res.player_list.map(function (player) {
           return '<tr><td>' + player.name + '</td><td>' + player.status + '</td></tr>';

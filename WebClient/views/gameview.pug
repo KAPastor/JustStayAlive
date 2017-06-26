@@ -93,14 +93,14 @@ html(lang='en')
             button.btn.btn-info.btn-block(type='button')#private_collect Collection 2 Food For Yourself
             hr
           .col-lg-6.text-center
-            button.btn.btn-info.btn-block(type='button') Collection 8 Food For The Community
+            button.btn.btn-info.btn-block(type='button')#community_collect Collection 8 Food For The Community
             hr
         .row
           .col-lg-6.text-center
-            button.btn.btn-info.btn-block(type='button') Attack Player for 2 Damage
+            button.btn.btn-info.btn-block(type='button')#attack_player Attack Player for 2 Damage
             hr
           .col-lg-6.text-center
-            button.btn.btn-info.btn-block(type='button') Heal Player for 2 Health
+            button.btn.btn-info.btn-block(type='button')#heal_player Heal Player for 2 Health
             hr
 
   
@@ -153,8 +153,10 @@ html(lang='en')
     .scroll-top.page-scroll.hidden-sm.hidden-xs.hidden-lg.hidden-md
       a.btn.btn-primary(href='#page-top')
         i.fa.fa-chevron-up
-    // Portfolio Modals
-    #portfolioModal1.portfolio-modal.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
+          
+          
+
+    #gameview_modal.gameview-modal.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
       .modal-content
         .close-modal(data-dismiss='modal')
           .lr
@@ -162,27 +164,9 @@ html(lang='en')
         .container
           .row
             .col-lg-8.col-lg-offset-2
-              .modal-body
-                h2 Project Title
-                hr.star-primary
-                img.img-responsive.img-centered(src='/public/img/portfolio/cabin.png', alt='')
-                p
-                  | Use this area of the page to describe your project. The icon above is part of a free icon set by
-                  a(href='https://sellfy.com/p/8Q9P/jV3VZ/') Flat Icons
-                  | . On their website, you can download their free set with 16 icons, or you can purchase the entire set with 146 icons for only $12!
-                ul.list-inline.item-details
-                  li
-                    | Client:
-                    strong
-                      a(href='http://startbootstrap.com') Start Bootstrap
-                  li
-                    | Date:
-                    strong
-                      a(href='http://startbootstrap.com') April 2014
-                  li
-                    | Service:
-                    strong
-                      a(href='http://startbootstrap.com') Web Development
-                button.btn.btn-default(type='button', data-dismiss='modal')
-                  i.fa.fa-times
-                  |  Close
+              .modal-body 
+                h2#gameview_modal_title Project Title
+                hr
+                #gameview_modal_desc
+                  
+                
