@@ -123,7 +123,7 @@ $(document).ready(function(){
 
 });
 
-poll_interval = setInterval(function(){ refresh_gameview(camp_name,player_name); }, 1000);
+poll_interval = setInterval(function(){ refresh_gameview(camp_name,player_name); }, 500);
 
 var current_day=0;
 var player_list;
