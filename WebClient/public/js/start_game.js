@@ -18,7 +18,9 @@ $(function() {
             var player_name = $("input#player_name").val();
 
             $.ajax({
-                url: "http://localhost:3000/enterGame",
+                // url: "http://localhost:3000/enterGame",
+                url: "http://159.203.1.198/jsa_service/enterGame",
+
                 type: "POST",
                 data: {
                     camp_name: camp_name,
