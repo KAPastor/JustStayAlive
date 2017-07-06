@@ -14,6 +14,7 @@ Array.prototype.allValuesSame = function() {
 //Building up the express framework
 var express = require('express');
 var Q = require('q');
+var common = require("./common/common.js");
 
 var app = express();
 
