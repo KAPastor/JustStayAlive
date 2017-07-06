@@ -18,7 +18,7 @@ $(function() {
             var player_name = $("input#player_name").val();
 
             $.ajax({
-                url: "http://192.168.0.196:3000/enterGame",
+                url: "http://localhost:3000/enterGame",
                 type: "POST",
                 data: {
                     camp_name: camp_name,
@@ -103,7 +103,7 @@ $('#name').focus(function() {
 function doPoll(camp_name,player_name){
   player_timeout =  setTimeout(function() {
     $.ajax({
-        url: "http://192.168.0.196:3000/getPlayerList",
+        url: "http://localhost:3000/getPlayerList",
         type: "POST",
         data: {
             camp_name: camp_name,
@@ -128,7 +128,7 @@ function doPoll(camp_name,player_name){
     },500);
      status_timeout = setTimeout(function() {
       $.ajax({
-          url: "http://192.168.0.196:3000/getCampStatus",
+          url: "http://localhost:3000/getCampStatus",
           type: "POST",
           data: {
               camp_name: camp_name
@@ -176,7 +176,7 @@ function doPoll(camp_name,player_name){
 function bind_start_game_button(camp_name,player_name){
   $('#start_game_message button').click(function(){
     $.ajax({
-        url: "http://192.168.0.196:3000/startGameSession",
+        url: "http://localhost:3000/startGameSession",
         type: "POST",
         data: {
             camp_name: camp_name,

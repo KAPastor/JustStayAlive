@@ -1,13 +1,3 @@
-Array.prototype.allValuesSame = function() {
-
-    for(var i = 1; i < this.length; i++)
-    {
-        if(this[i] !== this[0])
-            return false;
-    }
-
-    return true;
-}
 
 
 // JSA_Service:  This is the web RESTful API that managed the game state of Just Stay Alive
@@ -21,20 +11,17 @@ var app = express();
 var sqlite3 = require('sqlite3');
 
 function getRandomClass(){
-
   return {name:"Warrior",health:100,consumption:20,private_stockpile:0};
 }
 
-
-
 app.all('/', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", "localhost");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
  });
 
  app.use(function(req, res, next) {
-   res.header("Access-Control-Allow-Origin", "*");
+   res.header("Access-Control-Allow-Origin", "localhost");
    res.header("Access-Control-Allow-Headers", "X-Requested-With");
    next();
  });
