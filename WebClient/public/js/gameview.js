@@ -6,7 +6,8 @@ $(document).ready(function(){
     // Give the player state and tell it to update the state and action.
     // If the method determines you are the last person it advances the turn for all players
     $.ajax({
-        url: "http://localhost:3000/updatePlayerAction",
+        // url: "http://localhost:3000/updatePlayerAction",
+        url: "http://159.203.1.198/jsa_service/updatePlayerAction",
         type: "POST",
         data: {
             camp_name: camp_name,
@@ -27,7 +28,8 @@ $(document).ready(function(){
   $('#community_collect').click(function(){
     $(':button').prop('disabled', true);
     $.ajax({
-        url: "http://localhost:3000/updatePlayerAction",
+        // url: "http://localhost:3000/updatePlayerAction",
+        url: "http://159.203.1.198/jsa_service/updatePlayerAction",
         type: "POST",
         data: {
             camp_name: camp_name,
@@ -63,7 +65,8 @@ $(document).ready(function(){
       $('#gameview_modal').modal('hide');
 
       $.ajax({
-          url: "http://localhost:3000/updatePlayerAction",
+          // url: "http://localhost:3000/updatePlayerAction",
+          url: "http://159.203.1.198/jsa_service/updatePlayerAction",
           type: "POST",
           data: {
               camp_name: camp_name,
@@ -129,7 +132,8 @@ var current_day=0;
 var player_list;
 function refresh_gameview(){
   $.ajax({
-      url: "http://localhost:3000/refreshGameview",
+      // url: "http://localhost:3000/refreshGameview",
+      url: "http://159.203.1.198/jsa_service/refreshGameview",
       type: "POST",
       data: {
           camp_name: camp_name,
