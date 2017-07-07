@@ -5,8 +5,16 @@
 var express = require('express');
 var Q = require('q');
 var common = require("./common/common.js");
-
+var routes = require('./routes/jsa_routes');
 var app = express();
+
+var environment = process.env.NODE_ENV;
+if (environment=='DEV'){
+  console.log('============== JSA Service DEV ================');
+}else{
+  console.log('============== JSA Service Production ================');
+}
+
 
 var sqlite3 = require('sqlite3');
 
