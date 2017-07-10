@@ -1,38 +1,48 @@
-
-
-// JSA_Service:  This is the web RESTful API that managed the game state of Just Stay Alive
-//Building up the express framework
-var express = require('express');
-var Q = require('q');
-var common = require("./common/common.js");
-var routes = require('./routes/jsa_routes');
-var app = express();
+// JSA Service: ================================================================
+// Defines the web sockets and logic to serve the various clients
 
 var environment = process.env.NODE_ENV;
 if (environment=='DEV'){
   console.log('============== JSA Service DEV ================');
 }else{
-  console.log('============== JSA Service Production ================');
+  console.log('========== JSA Service Production =============');
 }
 
+var express = require('express');             // Express framework
+var Q = require('q');                         // Deferred promise
+var common = require("./common/common.js");   // Common .js functions
+var sqlite3 = require('sqlite3');             // Database module
 
-var sqlite3 = require('sqlite3');
+// Segmented functionality
+var enter_game_socket = require('./sockets/enter_game.js');
 
-function getRandomClass(){
-  return {name:"Warrior",health:100,consumption:20,private_stockpile:0};
-}
 
-app.all('/', function(req, res, next) {
+// Set up the server and web sockets
+var app = express();
+var server = app.listen(3000)
+var io = require('socket.io').listen(server);
+
+// Update the CORS headers
+app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
- });
+});
 
- app.use(function(req, res, next) {
-   res.header("Access-Control-Allow-Origin", "*");
-   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-   next();
- });
+// Define the connections and socket logic
+io.on('connection', function(socket){
+  console.log('___ A user connected: ' + socket.id);
+  socket.on('disconnected', function(){
+    console.log('___ A user disconnected: ' + socket.id);
+  });
+
+  enter_game_socket.run_socket(socket,Q,sqlite3);
+});
+
+
+
+
+
 
 // refreshGameview : Refreshes the visual display on the client side
 function refreshGameview(req,res){
@@ -116,62 +126,6 @@ app.get('/refreshGameview', function(req, res) {
 
 
 
-
- // enterGame: Checks and enters the camp as either a host or guest and returns the appropriate info.
-function enterGame(res,req){
-  var deferred  = Q.defer();
-  var db = new sqlite3.Database('JustStayAlive.db');
-  var camp_name = req.query.camp_name;
-  var player_name = req.query.player_name;
-  var response={response_code:"alert_player",response_type:"danger",response_desc:"Unassigned."};
-  db.serialize(function() { // serialize
-    // ==== Check to see if the camp name already exists =====
-    db.all("SELECT * FROM gamestate WHERE camp_name='"+camp_name+"'", function(err, rows) {
-      if (rows.length==1){ // If this is true then the camp name already exists
-        // Now we check to see the game status and if it is open for guests we can go ahead and add a guest.
-        if (rows[0].status == "accepting_guests"){ // The game has been created but is still accepting guest players
-          // Check to see if your player name has been taken already
-          db.all("SELECT * FROM player WHERE camp_name='"+camp_name+"' AND name='" + player_name + "'", function(err, rows) {
-             if (rows.length==1){ // In the name is taken send the message back:
-               response = {response_code:"alert_player",response_type:"warning",response_desc:"That player name is already in the camp. Please try another name."};
-               deferred.resolve(response);
-             }else{ //Add the player to the camp
-               db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
-                class_details.consumption+","+class_details.private_stockpile+",'Waiting','')");
-               response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a guest.", response_tag:"guest"};
-               deferred.resolve(response);
-             }
-          });
-        }else{
-          response = {response_code:"alert_player",response_type:"warning",response_desc:"The camp has closed it's doors to guests.  Please try another camp."};
-          deferred.resolve(response);
-
-        }
-      }else{ // In this case the game does not exist and the player will be the host. We need to make a new game state here.
-        // Create the game state and add host as first player
-
-        db.run("INSERT INTO gamestate VALUES ('"+camp_name+"','accepting_guests',0,50,2,10,'Game has been created and awaiting other players to join.')");
-
-        db.run("INSERT INTO player VALUES ('"+camp_name+"','"+player_name+"','"+class_details.name+"',"+class_details.health+","+
-         class_details.consumption+","+class_details.private_stockpile+",'Waiting','')");
-        response = {response_code:"success",response_type:"success",response_desc:"You have joined the camp as a host.", response_tag:"host"};
-        deferred.resolve(response);
-      }
-    });
-  });
-  return deferred.promise;
-}
- app.get('/enterGame', function(req, res) {
-   class_details = {};
-   class_details.name = "Warrior";
-   class_details.health = 100;
-   class_details.consumption = 20;
-   class_details.private_stockpile = 0;
-   enterGame(res,req).then(function(response){
-     res.jsonp(response);
-   });
- });
-// =============================================================================
 
 
 app.get('/updatePlayerAction', function(req, res) {
@@ -491,27 +445,6 @@ app.get('/getCampStatus', function(req, res) {
 
 
 
-// getPlayerList ---------------------------------------------------------------
-function getPlayerList(res,req){
-  var deferred  = Q.defer();
-  var db = new sqlite3.Database('JustStayAlive.db');
-  var camp_name = req.query.camp_name;
-  var player_list=[];
-  db.serialize(function() {
-    db.all("SELECT name FROM player WHERE camp_name='"+camp_name+"'", function(err, rows) {
-      response = {response_code:"success",response_type:"success",response_desc:"", response_val:rows};
-      deferred.resolve(response);
-    });
-  });
-  return deferred.promise;
-}
-app.get('/getPlayerList', function(req, res) {
-  getPlayerList(res,req).then(function(response){
-    res.jsonp(response);
-  });
-});
-// =============================================================================
-
 // startGameSession ---------------------------------------------------------------
 function startGameSession(res,req){
   var deferred  = Q.defer();
@@ -733,7 +666,6 @@ app.get('/checkAllTurnsPlayed', function(req, res) {
 
 
 
-app.listen(3000)
 var  bodyParser = require('body-parser'); // Middleware to read POST data
 
 // Set up body-parser.

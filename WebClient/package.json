@@ -1,12 +1,12 @@
 {
-  "name": "freelancer",
-  "title": "Freelancer",
-  "version": "3.3.7+1",
-  "homepage": "http://startbootstrap.com/template-overviews/freelancer",
-  "author": "Start Bootstrap",
+  "name": "JSA WebClient",
+  "title": "JSA WebClient",
+  "version": "0.0.0",
+  "homepage": "",
+  "author": "KAPastor",
   "license": {
     "type": "MIT",
-    "url": "https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE"
+    "url": ""
   },
   "devDependencies": {
     "bootstrap": "^3.3.7",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BlackrockDigital/startbootstrap-freelancer.git"
+    "url": ""
   },
   "dependencies": {
     "body-parser": "^1.17.2",
