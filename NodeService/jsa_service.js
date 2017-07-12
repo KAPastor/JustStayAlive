@@ -12,9 +12,11 @@ var express = require('express');             // Express framework
 var Q = require('q');                         // Deferred promise
 var common = require("./common/common.js");   // Common .js functions
 var sqlite3 = require('sqlite3');             // Database module
+var db = new sqlite3.Database('JustStayAlive.db');
 
 // Segmented functionality
 var enter_game_socket = require('./sockets/enter_game.js');
+var start_game_socket = require('./sockets/start_game.js');
 
 
 // Set up the server and web sockets
@@ -36,8 +38,15 @@ io.on('connection', function(socket){
     console.log('___ A user disconnected: ' + socket.id);
   });
 
-  enter_game_socket.run_socket(socket,Q,sqlite3);
+  enter_game_socket.run_socket(io,socket,Q,db);
+  start_game_socket.run_socket(io,socket,Q,db);
 });
+
+
+
+
+
+
 
 
 
@@ -120,7 +129,15 @@ app.get('/refreshGameview', function(req, res) {
 //==============================================================================
 
 
+app.get('/reset_database', function(req, res) {
+  var db = new sqlite3.Database('JustStayAlive.db');
+  console.log('Reset Database');
+  db.serialize(function() {
+    db.run("DELETE FROM gamestate");
+    db.run("DELETE FROM player");
 
+  });
+});
 
 
 
@@ -444,26 +461,6 @@ app.get('/getCampStatus', function(req, res) {
 
 
 
-
-// startGameSession ---------------------------------------------------------------
-function startGameSession(res,req){
-  var deferred  = Q.defer();
-  var db = new sqlite3.Database('JustStayAlive.db');
-  var camp_name = req.query.camp_name;
-  var player_list=[];
-  db.serialize(function() {
-    db.run("UPDATE gamestate SET status='Game is in session.' WHERE camp_name='"+camp_name+"'");
-    response = {response_code:"success",response_type:"success",response_desc:"Game has started."};
-    deferred.resolve(response);
-  });
-  return deferred.promise;
-}
-app.get('/startGameSession', function(req, res) {
-  startGameSession(res,req).then(function(response){
-    res.jsonp(response);
-  });
-});
-// =============================================================================
 
 
 
