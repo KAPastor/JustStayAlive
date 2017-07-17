@@ -28,7 +28,7 @@ jsa_socket.on('enter_game', function(res){
       $('#start_game_modal  #camp_name').html('You are the Host of Camp ' + res.data.camp_name);
       $('#start_game_message p').html('When all of the players have joined, please start the game.');
       $('#start_game_message button').show();
-      bind_start_game_button(camp_name,player_name);
+      bind_start_game_button(res.data.camp_name,res.data.player_name);
     }
     $('#start_game_modal').modal('show');
 
@@ -54,7 +54,7 @@ jsa_socket.on('start_game', function(res){
 
   // Load the gameview
   $.ajax({
-      url: "/load_gamview",
+      url: "/load_gameview",
       type: "POST",
       data: JSON.stringify({
           camp_name: camp_name,
@@ -73,93 +73,6 @@ jsa_socket.on('start_game', function(res){
       }
     });
 });
-
-
-
-// Lobby polling: continuously checks for the camp status
-function lobby_polling(camp_name,player_name){
-  player_timeout =  setTimeout(function() {
-    $.ajax({
-        url: base_ajax_url+"/getPlayerList",
-        type: "POST",
-        data: {
-            camp_name: camp_name,
-        },
-        crossDomain:true,
-        dataType : 'jsonp ',
-        contentType: 'application/json',
-        cache: false,
-        success: function(res) {
-          players = res.response_val;
-          // Populate the player list
-          var html = players.map(function (player) {
-            return '<tr><td>' + player.name + '</td></tr>';
-          }).join('');
-          $('#start_game_modal  #players > tbody').html(html);
-
-
-        },
-        error: function() {
-        }
-      });
-    },500);
-     status_timeout = setTimeout(function() {
-      $.ajax({
-          url: base_ajax_url+"/getCampStatus",
-          type: "POST",
-          data: {
-              camp_name: camp_name
-          },
-          crossDomain:true,
-          dataType : 'jsonp',
-          contentType: 'application/json',
-          cache: false,
-          success: function(res) {
-            if (res.response_val.status == "Game is in session."){
-              console.log("Game is in session.  Load the game page.")
-              console.log(camp_name);
-              console.log(player_name);
-
-              clearTimeout(status_timeout);
-              clearTimeout(player_timeout);
-              clearInterval(poll_interval);
-              $.ajax({
-                  url: "/load_gamview",
-                  type: "POST",
-                  data: JSON.stringify({
-                      camp_name: camp_name,
-                      player_name: player_name
-                  }),
-                  dataType : 'html',
-                  contentType: 'application/json',
-                  cache: false,
-                  success: function(res) {
-                    console.log(res)
-                    var newDoc = document.open("text/html", "replace");
-                    newDoc.write(res);
-                    newDoc.close();
-                  },
-                  error: function() {
-                  }
-                });
-              }
-          },
-          error: function() {
-          }
-        });
-      },500);
-}
-
-
-
-
-
-
-
-
-
-
-
 
 $(function() { // When the DOM is ready to go we run the following code
     $("#enterGameForm input,#enterGameForm textarea").jqBootstrapValidation({
@@ -200,7 +113,10 @@ function bind_start_game_button(camp_name,player_name){
   $('#start_game_message button').click(function(){
     var data = {
         camp_name: camp_name,
+        player_name: player_name
     }
+
+    console.log(data)
     jsa_socket.emit('start_game',data);
   });
 

@@ -29,9 +29,10 @@ app.get('/',function(req,res){
 });
 
 // Loads the gameview state to the user by prerendering the page.
-app.post('/load_gamview',function(req,res){
+app.post('/load_gameview',function(req,res){
   res.render('gameview', {camp_name: req.body.camp_name,
-    player_name: req.body.player_name})
+    player_name: req.body.player_name,
+    base_ajax_url: base_ajax_url})
     // player_session_ID: req.body.camp_name});
 });
 

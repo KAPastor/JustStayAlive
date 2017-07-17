@@ -13,16 +13,13 @@ start_game_class.startGameSession = function (data,Q,db) {
 
 
 start_game_class.run_socket = function (io,socket,Q,db) {
-
   socket.on('start_game', function (data) {
     console.log(data)
     start_game_class.startGameSession(data,Q,db).then(function(response){
       var passback = {data:data,response:response};
       console.log('___ Emitting start game');
-      console.log(passback.data.camp_name)
-      // ------->  SOCKET IS NOT EMMITTING TO THE ROOMS!
+      console.log(passback)
       io.to(passback.data.camp_name).emit('start_game',passback);
-
     });
 
   });
